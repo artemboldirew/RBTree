@@ -9,10 +9,13 @@ public class Main {
         tree.put(3, "Gleb");
         tree.put(7, "Egor");
         tree.put(1, "Huesos");
-//        String d = tree.get(3);
-//        System.out.println(d);
-        tree.printTree();
-        tree.rotateRight(tree.root);
+        tree.put(13, "Roma");
+        tree.put(0, "Misha");
+        tree.put(6, "Stas");
+        tree.put(14, "Stas2");
+        tree.put(15, "Stas3");
+        tree.put(16, "Stas4");
+        tree.put(17, "Stas5");
         System.out.println();
         System.out.println();
         tree.printTree();

@@ -81,6 +81,7 @@ public class RBTreeMap<K extends Comparable<K>, V> implements Map<K, V> {
 
     @Override
     public V put(K key, V value) {
+        Node<K, V> node = null;
         if (size == 0) {
             root = new Node<>(key, value);
             root.isRed = false;
@@ -94,6 +95,10 @@ public class RBTreeMap<K extends Comparable<K>, V> implements Map<K, V> {
                     next = next.left;
                 } else {
                     next.left = new Node<>(key, value, next);
+                    node = next.left;
+                    balanceTree(node);
+                    //printTree();
+                    //System.out.println();
                     size++;
                     return value;
                 }
@@ -103,6 +108,10 @@ public class RBTreeMap<K extends Comparable<K>, V> implements Map<K, V> {
                     next = next.right;
                 } else {
                     next.right = new Node<>(key, value, next);
+                    node = next.right;
+                    balanceTree(node);
+                    //printTree();
+                    //System.out.println();
                     size++;
                     return value;
                 }
@@ -142,6 +151,11 @@ public class RBTreeMap<K extends Comparable<K>, V> implements Map<K, V> {
     }
 
     private void balanceTree(Node<K, V> node) {
+        //System.out.println("Вызван для " + node.value);
+        //printTree();
+        if (node == null) {
+            throw new RuntimeException("Вставляемый элемент равен нулю");
+        }
         Node<K, V> parent = node.parent;
 
         if (parent != null && parent.isRed && parent.parent != null) {
@@ -151,14 +165,47 @@ public class RBTreeMap<K extends Comparable<K>, V> implements Map<K, V> {
                 parent.isRed = false;
                 uncle.isRed = false;
                 grandParent.isRed = grandParent != root;
+                balanceTree(grandParent);
             }
+            else if (!isNodeRed(uncle) && (node == parent.right ^ parent == grandParent.right)) {
+                if (node == parent.left) {
+                    rotateRight(parent);
+                    rotateLeft(grandParent);
+                    grandParent.isRed = true;
+                    grandParent.parent.isRed = false;
+                    balanceTree(grandParent);
+                }
+                else {
+                    rotateLeft(parent);
+                    rotateRight(grandParent);
+                    grandParent.isRed = true;
+                    grandParent.parent.isRed = false;
+                    balanceTree(grandParent);
+                }
+            }
+
+            else if (!isNodeRed(uncle) && (node == parent.right) == (parent == grandParent.right)) {
+                if (node == parent.left) {
+                    rotateRight(grandParent);
+                    grandParent.isRed = true;
+                    grandParent.parent.isRed = false;
+                    balanceTree(grandParent);
+                }
+                else {
+                    rotateLeft(grandParent);
+                    grandParent.isRed = true;
+                    grandParent.parent.isRed = false;
+                    balanceTree(grandParent);
+                }
+            }
+
         }
     }
 
     private void printTreeRecursive(Node<K, V> node, String prefix, boolean isLeft) {
         if (node == null) return;
-
-        System.out.println(prefix + (isLeft ? "├── " : "└── ") + node.value);
+        String color = node.isRed ? "R" : "B";
+        System.out.println(prefix + (isLeft ? "├── " : "└── ") + color + " " + node.value);
         printTreeRecursive(node.left, prefix + (isLeft ? "│   " : "    "), true);
         printTreeRecursive(node.right, prefix + (isLeft ? "│   " : "    "), false);
     }
@@ -169,24 +216,57 @@ public class RBTreeMap<K extends Comparable<K>, V> implements Map<K, V> {
 
 
     public void rotateRight(Node<K, V> h) {
+        if (h == null || h.left == null) {
+            return; // или выбросить исключение
+        }
+
         Node<K, V> leftChild = h.left;
         Node<K, V> rightGrandSon = leftChild.right;
-        if (h == root) {
+
+        leftChild.parent = h.parent;
+
+        if (h == root) { //замена ссылки у родителя вершины
             root = leftChild;
-        }
-        else if (h == h.parent.right) {
+        } else if (h == h.parent.right) {
             h.parent.right = leftChild;
-        }
-        else {
+        } else {
             h.parent.left = leftChild;
         }
-        leftChild.parent = h.parent;
-        leftChild.right = h;
+
+        leftChild.right = h;//замена связи у h и leftChild
+        h.parent = leftChild;
+
         h.left = rightGrandSon;
+        if (rightGrandSon != null) {
+            rightGrandSon.parent = h;
+        }
     }
 
     private void rotateLeft(Node<K, V> h) {
+        if (h == null || h.right == null) {
+            return; // или выбросить исключение
+        }
 
+        Node<K, V> rightChild = h.right;
+        Node<K, V> leftGrandSon = rightChild.left;
+
+        rightChild.parent = h.parent;
+
+        if (h == root) { //замена ссылки у родителя вершины
+            root = rightChild;
+        } else if (h == h.parent.right) {
+            h.parent.right = rightChild;
+        } else {
+            h.parent.left = rightChild;
+        }
+
+        rightChild.left = h;//замена связи у h и leftChild
+        h.parent = rightChild;
+
+        h.right = leftGrandSon;
+        if (leftGrandSon != null) {
+            leftGrandSon.parent = h;
+        }
     }
 
     private boolean isNodeRed(Node<K, V> h) {
