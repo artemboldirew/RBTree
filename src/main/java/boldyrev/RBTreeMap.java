@@ -9,7 +9,7 @@ public class RBTreeMap<K extends Comparable<K>, V> implements Map<K, V> {
     private static final boolean RED = true;
     private static final boolean BLACK = false;
 
-    public static class Node<K, V> {
+    private static class Node<K, V> {
         K key;
         V value;
         boolean isRed;
@@ -205,7 +205,7 @@ public class RBTreeMap<K extends Comparable<K>, V> implements Map<K, V> {
     private void printTreeRecursive(Node<K, V> node, String prefix, boolean isLeft) {
         if (node == null) return;
         String color = node.isRed ? "R" : "B";
-        System.out.println(prefix + (isLeft ? "├── " : "└── ") + color + " " + node.value);
+        System.out.println(prefix + (isLeft ? "├── " : "└── ") + color + " " + node.key + ": " +  node.value);
         printTreeRecursive(node.left, prefix + (isLeft ? "│   " : "    "), true);
         printTreeRecursive(node.right, prefix + (isLeft ? "│   " : "    "), false);
     }
@@ -272,5 +272,29 @@ public class RBTreeMap<K extends Comparable<K>, V> implements Map<K, V> {
     private boolean isNodeRed(Node<K, V> h) {
         boolean isRed = h != null && h.isRed;
         return isRed;
+    }
+
+    public void fromA2B() {
+        if (root.key instanceof String) {
+            fromA2BHelper(root);
+        }
+    }
+
+    public void fromA2BHelper(Node<K, V> node) {
+        if (node == null) {
+            return;
+        }
+        String key = (String) node.key;
+        if (key.compareTo("B") > 0) {
+            fromA2BHelper(node.left);
+        }
+        else if (key.compareTo("A") >= 0 && key.compareTo("B") <= 0) {
+            System.out.println(node.key + ": " + node.value);
+            fromA2BHelper(node.left);
+            fromA2BHelper(node.right);
+        }
+        else {
+            fromA2BHelper(node.right);
+        }
     }
 }
