@@ -13,6 +13,7 @@ public class Main {
         tree.put("Cada", 10);
         tree.put("Avtyrf", 10);
         tree.put("B", 10);
+        tree.put("Ba", 10);
         System.out.println();
         tree.printTree();
         System.out.println();
@@ -26,6 +27,7 @@ public class Main {
         tree2.put("Cada", 10);
         tree2.put("Avtyrf", 10);
         tree2.put("B", 10);
+        tree2.put("Ba", 10);
         NavigableMap<String, Integer> subMap = tree2.subMap("A", true, "B", true);
 
         for (Map.Entry<String, Integer> entry : subMap.entrySet()) {
